@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/umich_cse593_prototype/static/css/main.e96d5dd1.css",
+    "main.js": "/umich_cse593_prototype/static/js/main.d75a1692.js",
+    "static/js/453.68693753.chunk.js": "/umich_cse593_prototype/static/js/453.68693753.chunk.js",
+    "index.html": "/umich_cse593_prototype/index.html",
+    "main.e96d5dd1.css.map": "/umich_cse593_prototype/static/css/main.e96d5dd1.css.map",
+    "main.d75a1692.js.map": "/umich_cse593_prototype/static/js/main.d75a1692.js.map",
+    "453.68693753.chunk.js.map": "/umich_cse593_prototype/static/js/453.68693753.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e96d5dd1.css",
+    "static/js/main.d75a1692.js"
+  ]
+}
