@@ -90,7 +90,7 @@ const NoteViewer = ({ docUrl, setDocUrl, insertText }) => {
             width: "80%",
             backgroundColor: "rgba(85, 85, 85, 0.8)",
             borderRadius: "8px",
-            padding: "10px",
+            padding: "15px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
             display: "flex",
             flexDirection: "column",
@@ -109,7 +109,7 @@ const NoteViewer = ({ docUrl, setDocUrl, insertText }) => {
             sx={{
               marginTop: "10px",
               display: "flex",
-              gap: "20px",
+              gap: "30px",
               alignItems: "center",
               width: "100%",
             }}
