@@ -1,15 +1,16 @@
 {
   "files": {
     "main.css": "/umich_cse593_prototype/static/css/main.e96d5dd1.css",
-    "main.js": "/umich_cse593_prototype/static/js/main.b1cc1dbb.js",
+    "main.js": "/umich_cse593_prototype/static/js/main.10c7d3c9.js",
     "static/js/453.ed3810f9.chunk.js": "/umich_cse593_prototype/static/js/453.ed3810f9.chunk.js",
+    "static/media/simple_processed.png": "/umich_cse593_prototype/static/media/simple_processed.c6846fc4a811024974d4.png",
     "index.html": "/umich_cse593_prototype/index.html",
     "main.e96d5dd1.css.map": "/umich_cse593_prototype/static/css/main.e96d5dd1.css.map",
-    "main.b1cc1dbb.js.map": "/umich_cse593_prototype/static/js/main.b1cc1dbb.js.map",
+    "main.10c7d3c9.js.map": "/umich_cse593_prototype/static/js/main.10c7d3c9.js.map",
     "453.ed3810f9.chunk.js.map": "/umich_cse593_prototype/static/js/453.ed3810f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e96d5dd1.css",
-    "static/js/main.b1cc1dbb.js"
+    "static/js/main.10c7d3c9.js"
   ]
 }
