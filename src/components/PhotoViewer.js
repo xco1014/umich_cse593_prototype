@@ -1,113 +1,188 @@
 import React, { useState } from "react";
-import { Button } from "@mui/material";
-import photo1 from "../sample/photo1.png"
+import Tesseract from "tesseract.js";
+import { Button, CircularProgress } from "@mui/material";
+import photo1 from "../sample/simple.png";
+import photo2 from "../sample/simple2.png";
+import photo3 from "../sample/simple_processed.png";
 
 const PhotoViewer = ({ onNavigateToFormula }) => {
-  // Mock photo data
-  const photos = [
-    {
-      id: 1,
-      url: photo1,
-      formulas: [
-        { id: 1, x: 10, y: 30, width: 10, height: 40, content: "x^2 + y^2 = z^2" },
-        { id: 2, x: 20, y: 10, width: 20, height: 50, content: "E = mc^2" },
-      ],
-    },
-    {
-      id: 2,
-      url:photo1,
-      formulas: [
-        { id: 3, x: 10, y: 5, width: 10, height: 6, content: "F = ma" },
-      ],
-    },
-    {
-      id: 3,
-      url: photo1,
-      formulas: [],
-    },
-  ];
+  const [photos, setPhotos] = useState([
+    { id: 1, url: photo1 },
+    { id: 2, url: photo2 },
+    { id: 3, url: photo3 },
+  ]);
 
   const [selectedPhoto, setSelectedPhoto] = useState(photos[0]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formula, setFormula] = useState("");
+  const [ocrError, setOcrError] = useState("");
 
-  const handlePhotoClick = (photo) => {
-    setSelectedPhoto(photo);
+  // Function to run OCR on the selected photo
+  const runOCR = async (photo) => {
+    setIsLoading(true);
+    setFormula("");
+    setOcrError("");
+
+    try {
+      const result = await Tesseract.recognize(photo.url, "eng", {
+        logger: (info) => console.log("OCR Progress:", info),
+      });
+
+      if (!result || !result.data || !result.data.text) {
+        throw new Error("OCR failed to detect any text.");
+      }
+
+      console.log("Full OCR Text:", result.data.text);
+
+      // Use regex to extract all possible formulas
+      const formulaRegex = /[0-9\s\+\-\*\/\%\^=\(\)]+/g; // Matches entire mathematical expressions, including %
+      const detectedFormulas = result.data.text.match(formulaRegex);
+
+      if (!detectedFormulas || detectedFormulas.length === 0) {
+        throw new Error("No formula detected.");
+      }
+
+      // Select the longest formula as the most likely candidate
+      let longestFormula = detectedFormulas.reduce((a, b) =>
+        a.length > b.length ? a : b
+      );
+
+      // Post-process the OCR result to fix common errors
+      longestFormula = correctOCRResult(longestFormula);
+
+      setFormula(longestFormula.trim()); // Update the button with the corrected formula
+    } catch (error) {
+      console.error("OCR Error:", error.message || error);
+      setOcrError(error.message || "Failed to process the image.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditFormula = (formulaContent) => {
-    onNavigateToFormula(formulaContent); // Pass formula content to Formula tab
+  // Function to handle file uploads
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const newPhotoUrl = URL.createObjectURL(file); // Create a temporary URL for the uploaded photo
+      const newPhoto = { id: photos.length + 1, url: newPhotoUrl };
+      setPhotos((prevPhotos) => [...prevPhotos, newPhoto]);
+      setSelectedPhoto(newPhoto); // Automatically select the uploaded photo
+      runOCR(newPhoto); // Automatically run OCR on the new photo
+    }
+  };
+
+  // Handles photo selection
+  const handlePhotoClick = (photo) => {
+    setSelectedPhoto(photo);
+    runOCR(photo); // Rerun OCR whenever a new photo is selected
+  };
+
+  // Handles navigation to the formula page
+  const handleEditFormula = () => {
+    if (formula) {
+      onNavigateToFormula(formula); // Pass the detected formula to the Formula page
+    }
+  };
+
+  // Correct OCR Result
+  const correctOCRResult = (text) => {
+    return text
+      .replace(/%/g, "*") // Replace % with *
+      .replace(/[^\d\+\-\*\/\^=\(\)\s]/g, ""); // Remove invalid characters
   };
 
   return (
-    <div style={{ display: "flex", height: "100%", margin: "5px" }}>
-      {/* Photo Gallery */}
-      <div
-        style={{
-          width: "20%",
-          borderRight: "1px solid #ddd",
-          padding: "10px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-        }}
-      >
-        {photos.map((photo) => (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", margin: "5px" }}>
+      {/* Photo Viewer */}
+      <div style={{ display: "flex", height: "85%" }}>
+        {/* Photo Gallery */}
+        <div
+          style={{
+            width: "20%",
+            borderRight: "1px solid #ddd",
+            padding: "10px",
+            boxSizing: "border-box",
+            overflowY: "auto",
+          }}
+        >
+          {photos.map((photo) => (
+            <img
+              key={photo.id}
+              src={photo.url}
+              style={{
+                width: "95%",
+                cursor: "pointer",
+                marginBottom: "10px",
+                border:
+                  selectedPhoto.id === photo.id
+                    ? "2px solid #1976d2"
+                    : "2px solid transparent",
+              }}
+              onClick={() => handlePhotoClick(photo)}
+              alt={`Photo ${photo.id}`}
+            />
+          ))}
+
+          {/* File Upload Button */}
+          <div style={{ marginTop: "10px", textAlign: "center" }}>
+            {/* Hidden File Input */}
+            <input
+              type="file"
+              accept="image/*"
+              id="photo-upload"
+              style={{ display: "none" }} // Hide the native file input
+              onChange={handlePhotoUpload}
+            />
+
+            {/* Styled Label for File Input */}
+            <label
+              htmlFor="photo-upload"
+              style={{
+                display: "inline-block",
+                padding: "10px 20px",
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                fontSize: "14px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                textAlign: "center",
+              }}
+            >
+              Add Photo
+            </label>
+          </div>
+        </div>
+
+        {/* Photo Viewer */}
+        <div style={{ width: "80%", position: "relative", backgroundColor: "#f4f4f4" }}>
           <img
-            key={photo.id}
-            src={photo.url}
-            style={{
-              width: "95%",
-              cursor: "pointer",
-              marginBottom: "10px",
-              border: selectedPhoto.id === photo.id ? "2px solid #1976d2" : "2px solid transparent",
-            }}
-            onClick={() => handlePhotoClick(photo)}
+            src={selectedPhoto.url}
+            alt="Selected Photo"
+            style={{ width: "100%", display: "block" }}
           />
-        ))}
+        </div>
       </div>
 
-      {/* Photo Viewer with Formula Overlays */}
-      <div style={{ width: "80%", position: "relative", backgroundColor: "#f4f4f4" }}>
-        <img
-          src={selectedPhoto.url}
-          alt="Selected Photo"
-          style={{ width: "100%", display: "block" }}
-        />
-
-        {selectedPhoto.formulas.map((formula) => (
-          <div
-            key={formula.id}
+      {/* Edit Formula Button */}
+      <div style={{ marginTop: "10px", textAlign: "center" }}>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <Button
+            variant="contained"
             style={{
-              position: "absolute",
-              top: `${formula.y}%`,
-              left: `${formula.x}%`,
-              width: `${formula.width}%`,
-              height: `${formula.height}%`,
-              backgroundColor: "rgba(255, 255, 0, 0.4)",
-              border: "1px solid #cccc00",
-              cursor: "pointer",
+              backgroundColor: "green",
+              color: "white",
             }}
+            onClick={handleEditFormula}
+            disabled={!formula || formula === "No formula detected"}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: `100%`,
-                left: 0,
-                backgroundColor: "#fff",
-                borderRadius: "4px",
-                zIndex: 10,
-                whiteSpace: "nowrap",
-              }}
-              className="popup-button"
-            >
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => handleEditFormula(formula.content)}
-              >
-                Edit Formula
-              </Button>
-            </div>
-          </div>
-        ))}
+            {formula ? `Edit Formula: ${formula}` : "No Formula Detected"}
+          </Button>
+        )}
+        {ocrError && (
+          <p style={{ color: "red", marginTop: "10px" }}>{ocrError}</p>
+        )}
       </div>
     </div>
   );
