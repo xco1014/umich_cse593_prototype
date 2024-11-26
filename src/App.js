@@ -8,6 +8,7 @@ import PdfViewer from "./components/PdfViewer";
 import PhotoViewer from "./components/PhotoViewer";
 import NoteViewer from "./components/NoteViewer";
 
+
 function App() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [formula, setFormula] = useState("");
@@ -116,8 +117,13 @@ function App() {
             <Tab label="Zoom" />
           </Tabs>
           {selectedTab === 0 && (
-            <Box>
-              <p>Browser tools placeholder</p>
+            <Box sx={{ height: "50vh", display: "flex", flexDirection: "column" }}>
+            <iframe
+                    src="https://en.wikipedia.org/wiki/Main_Page"
+                    title="Embedded Browser"
+                    style={{ width: "100%", height: "100%", border: "none" }}
+                  ></iframe>
+
             </Box>
           )}
           {selectedTab === 1 && (
