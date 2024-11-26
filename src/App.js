@@ -1,17 +1,20 @@
 // App.js
-import React from "react";
+import React, { useState, useRef } from "react";
 import { Box, Tabs, Tab, Button, TextField, IconButton } from "@mui/material";
 import { SplitPane } from "react-multi-split-pane";
+import { gapi } from "gapi-script";
 import "./App.css";
 import PdfViewer from "./components/PdfViewer";
 import PhotoViewer from "./components/PhotoViewer";
 import NoteViewer from "./components/NoteViewer";
 
-
 function App() {
-  const [selectedTab, setSelectedTab] = React.useState(0);
-  const [formula, setFormula] = React.useState("");
-  const ref = React.useRef(0);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [formula, setFormula] = useState("");
+  const [docUrl, setDocUrl] = useState(
+    "https://docs.google.com/document/d/1FrDJsFI-T9OZsxB5XIlLA9tJpLEWxhXMXg9HpuHdOgY/edit?usp=sharing"
+  );
+  const ref = useRef(0);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -39,18 +42,39 @@ function App() {
   };
 
   const handleCopyToClipboard = () => {
-    const dataTransfer = new DataTransfer()
-    dataTransfer.items.add(formula, "text/plain")
-  
-    const pasteEvent = new ClipboardEvent('paste', {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(formula, "text/plain");
+
+    const pasteEvent = new ClipboardEvent("paste", {
       bubbles: true,
       cancelable: true,
       clipboardData: dataTransfer,
-    })
+    });
     ref.current.focus();
-    ref.current.dispatchEvent(pasteEvent)
-  
+    ref.current.dispatchEvent(pasteEvent);
+
     navigator.clipboard.writeText(formula);
+  };
+
+  const insertText = (text) => {
+    gapi.client.docs.documents
+      .batchUpdate({
+        documentId: docUrl.split("/")[5],
+        requests: [
+          {
+            insertText: {
+              endOfSegmentLocation: {},
+              text: `${text}\n`,
+            },
+          },
+        ],
+      })
+      .then((response) => {
+        console.log("Text inserted:", response);
+      })
+      .catch((err) => {
+        console.error("Error inserting text:", err);
+      });
   };
 
   return (
@@ -123,11 +147,10 @@ function App() {
                   ))}
                 </Box>
                 <Button
-                  onClick={handleCopyToClipboard}
+                  onClick={() => insertText(formula)}
                   variant="contained"
-                  color="secondary"
                 >
-                  Copy Formula to Clipboard
+                  Insert Formula
                 </Button>
               </Box>
               {/* Formula Editor */}
@@ -139,8 +162,8 @@ function App() {
                 onChange={(e) => setFormula(e.target.value)}
                 placeholder="Edit your formula here..."
                 inputRef={ref}
-                InputProps={{ style: { fontSize: 30,  } }}
-                inputProps={{ style: { textAlign: "center"  } }}
+                InputProps={{ style: { fontSize: 30 } }}
+                inputProps={{ style: { textAlign: "center" } }}
               />
             </Box>
           )}
@@ -154,7 +177,11 @@ function App() {
 
       {/* Right Pane: Google Doc */}
       <Box sx={{ height: "100%", width: "100%", backgroundColor: "#ffffff" }}>
-        <NoteViewer/>
+        <NoteViewer
+          insertText={insertText}
+          docUrl={docUrl}
+          setDocUrl={setDocUrl}
+        />
       </Box>
     </SplitPane>
   );
