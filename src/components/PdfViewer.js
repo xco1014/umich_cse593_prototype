@@ -24,7 +24,7 @@ const PdfViewer = () => {
       </div>)}
 
       {/* PDF Viewer */}
-      <div style={{ flex: 1, border: "1px solid #ddd", marginTop: "10px" }}>
+      <div style={{ flex: 1, border: "1px solid #ddd" }}>
         {pdfUrl ? (
           <iframe
             src={pdfUrl}

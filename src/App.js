@@ -84,7 +84,7 @@ function App() {
           sx={{
             height: "100%",
             width: "100%",
-            padding: 2,
+            padding: 0,
             backgroundColor: "#f5f5f5",
           }}
         >
@@ -95,7 +95,7 @@ function App() {
           sx={{
             height: "100%",
             width: "100%",
-            padding: 2,
+            padding: "0",
             backgroundColor: "#eeeeee",
           }}
         >
@@ -134,7 +134,7 @@ function App() {
             </Box>
           )}
           {selectedTab === 2 && (
-            <Box sx={{ height: "calc(100% - 48px)" }}>
+            <Box sx={{ height: "calc(100% - 48px)", padding: "5px" }}>
               {/* Formula Tools */}
               <Box
                 sx={{

@@ -131,7 +131,7 @@ const PhotoViewer = ({ onNavigateToFormula, photos, setPhotos }) => {
         >
           {/* File Upload Button */}
           <div
-            style={{ margin: "10px 0px", textAlign: "center", width: "100%" }}
+            style={{ marginBottom: "10px", textAlign: "center", width: "100%" }}
           >
             <input
               type="file"
