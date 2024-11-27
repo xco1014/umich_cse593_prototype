@@ -7,9 +7,9 @@ const NoteViewer = ({ docUrl, setDocUrl, insertText }) => {
   const [suggestionsRaw, setSuggestionsRaw] = useState(
     JSON.stringify(
       [
-        { text: "Consider rephrasing this sentence for clarity." },
-        { text: "Would you like to add an example here?" },
-        { text: "Ensure consistency in terminology across the document." },
+        { text: "Binomials - 2 terms:" },
+        { text: "Trinomials - 3 terms:" },
+        { text: "Polynomials - Sum of monomials:" },
       ],
       null,
       2
@@ -26,7 +26,7 @@ const NoteViewer = ({ docUrl, setDocUrl, insertText }) => {
     if (start) {
       const delay = setTimeout(() => {
         if (suggestions.length > 0) setCurrentSuggestionIndex(0); // Show the first suggestion
-      }, 5000); // 5 seconds delay for Google Docs to load
+      }, 40000); // 5 seconds delay for Google Docs to load
       return () => clearTimeout(delay);
     }
   }, [start, suggestions]);
@@ -45,7 +45,7 @@ const NoteViewer = ({ docUrl, setDocUrl, insertText }) => {
 
   const moveToNextSuggestion = () => {
     if (currentSuggestionIndex < suggestions.length - 1) {
-      const delay = Math.random() * 4000 + 1000; // Random delay between 1-5 seconds
+      const delay = Math.random() * 10000 + 25000; // Random delay between 1-5 seconds
       setTimeout(() => {
         setCurrentSuggestionIndex(currentSuggestionIndex + 1);
       }, delay);

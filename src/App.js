@@ -7,7 +7,9 @@ import "./App.css";
 import PdfViewer from "./components/PdfViewer";
 import PhotoViewer from "./components/PhotoViewer";
 import NoteViewer from "./components/NoteViewer";
-
+import photo1 from "./sample/newSample1.png";
+import photo2 from "./sample/newSample2.png";
+import photo3 from "./sample/newSample3.png";
 
 function App() {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -15,6 +17,12 @@ function App() {
   const [docUrl, setDocUrl] = useState(
     "https://docs.google.com/document/d/1FrDJsFI-T9OZsxB5XIlLA9tJpLEWxhXMXg9HpuHdOgY/edit?usp=sharing"
   );
+  const [photos, setPhotos] = useState([
+    { id: 0, url: photo1, ocrResults: null },
+    { id: 1, url: photo2, ocrResults: null },
+    { id: 2, url: photo3, ocrResults: null },
+  ]);
+
   const ref = useRef(0);
 
   const handleTabChange = (event, newValue) => {
@@ -42,21 +50,6 @@ function App() {
     setSelectedTab(2); // Index of "Formula" tab
   };
 
-  const handleCopyToClipboard = () => {
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(formula, "text/plain");
-
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData: dataTransfer,
-    });
-    ref.current.focus();
-    ref.current.dispatchEvent(pasteEvent);
-
-    navigator.clipboard.writeText(formula);
-  };
-
   const insertText = (text) => {
     gapi.client.docs.documents
       .batchUpdate({
@@ -65,7 +58,7 @@ function App() {
           {
             insertText: {
               endOfSegmentLocation: {},
-              text: `${text}\n`,
+              text: `\n${text}`,
             },
           },
         ],
@@ -117,22 +110,31 @@ function App() {
             <Tab label="Zoom" />
           </Tabs>
           {selectedTab === 0 && (
-            <Box sx={{ height: "50vh", display: "flex", flexDirection: "column" }}>
-            <iframe
-                    src="https://en.wikipedia.org/wiki/Main_Page"
-                    title="Embedded Browser"
-                    style={{ width: "100%", height: "100%", border: "none" }}
-                  ></iframe>
-
+            <Box
+              sx={{
+                height: "calc(100% - 48px)",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <iframe
+                src="https://en.wikipedia.org/wiki/Main_Page"
+                title="Embedded Browser"
+                style={{ width: "100%", height: "100%", border: "none" }}
+              ></iframe>
             </Box>
           )}
           {selectedTab === 1 && (
-            <Box>
-              <PhotoViewer onNavigateToFormula={handleJumpToFormula} />
+            <Box sx={{ height: "calc(100% - 48px)" }}>
+              <PhotoViewer
+                onNavigateToFormula={handleJumpToFormula}
+                photos={photos}
+                setPhotos={setPhotos}
+              />
             </Box>
           )}
           {selectedTab === 2 && (
-            <Box>
+            <Box sx={{ height: "calc(100% - 48px)" }}>
               {/* Formula Tools */}
               <Box
                 sx={{
@@ -142,7 +144,7 @@ function App() {
                 }}
               >
                 <Box>
-                  {["α", "β", "γ", "∫", "∑"].map((char) => (
+                  {["α", "β", "γ", "∫", "∑", "^"].map((char) => (
                     <IconButton
                       key={char}
                       onClick={() => handleInsertCharacter(char)}
@@ -152,10 +154,7 @@ function App() {
                     </IconButton>
                   ))}
                 </Box>
-                <Button
-                  onClick={() => insertText(formula)}
-                  variant="contained"
-                >
+                <Button onClick={() => insertText(formula)} variant="contained">
                   Insert Formula
                 </Button>
               </Box>
