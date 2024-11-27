@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Umich CSE 593 Prototype -  Mutitasking Notetaker by TypeMinds
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
